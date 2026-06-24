@@ -90,6 +90,17 @@
     /* Stamp look */
     .stamp { border: 4px double #16130f; }
 
+    /* Checklist jump-to highlight */
+    @keyframes flashTarget {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(31,111,224,0); }
+      15%      { box-shadow: 0 0 0 6px rgba(31,111,224,0.9); }
+      60%      { box-shadow: 0 0 0 6px rgba(31,111,224,0.55); }
+    }
+    .flash-target { animation: flashTarget 1.8s ease-out; border-radius: 16px; }
+    @media (prefers-reduced-motion: reduce) {
+      .flash-target { animation: none; outline: 4px solid #1f6fe0; outline-offset: 3px; }
+    }
+
     /* Focus visibility */
     a:focus-visible, button:focus-visible, [tabindex]:focus-visible, input:focus-visible, summary:focus-visible {
       outline: 4px solid #1f6fe0; outline-offset: 3px; border-radius: 4px;
@@ -249,7 +260,7 @@
     </p>
 
     <!-- ============ CHAPTER TABS ============ -->
-    <nav id="profile-tabs" role="tablist" aria-label="Moments in the session" class="mt-7 flex flex-wrap gap-3"></nav>
+    <nav id="profile-tabs" role="tablist" aria-label="Moments in the session" class="mt-7 flex flex-wrap gap-3 scroll-mt-6"></nav>
 
     <!-- ============ STORY (scenario panels) ============ -->
     <section id="story" class="mt-6" aria-live="polite"></section>
@@ -258,7 +269,7 @@
     <div class="mt-10">
 
       <!-- The Tutor's Field Handbook (glossary + search) -->
-      <section class="ink rounded-2xl overflow-hidden" aria-labelledby="handbook-title">
+      <section id="sec-handbook" class="ink rounded-2xl overflow-hidden scroll-mt-6" aria-labelledby="handbook-title">
         <div class="bg-pop-yellow dots px-5 py-3 border-b-4 border-ink">
           <h2 id="handbook-title" class="font-pow text-2xl sm:text-3xl tracking-wide text-ink">The Tutor's Field Handbook</h2>
           <p class="font-bold text-sm text-ink/80">Terms I actually used with Alex. Search or tap to open.</p>
@@ -278,15 +289,11 @@
     </div>
 
     <!-- ============ FIELD NOTES (REAL SERVICE-LEARNING) ============ -->
-    <section class="mt-12" aria-labelledby="fieldnotes-title">
+    <section id="sec-fieldnotes" class="mt-12 scroll-mt-6" aria-labelledby="fieldnotes-title">
       <div class="bg-pop-blue dots ink rounded-2xl px-5 py-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
         <h2 id="fieldnotes-title" class="font-pow text-3xl sm:text-4xl tracking-wide text-paper drop-shadow-[2px_2px_0_#16130f]">FROM MY REAL SHIFTS</h2>
         <span class="caption text-ink rounded px-2.5 py-1 text-xs font-bold">7 SERVICE-LEARNING FIELD NOTES</span>
       </div>
-      <p class="caption rounded-xl px-4 py-3 font-bold text-ink text-sm sm:text-base mb-6">
-        Notes from my actual sessions with Alex. I wrote these after my shifts, not during class.
-      </p>
-
       <div class="grid sm:grid-cols-2 gap-5">
         <!-- 1 -->
         <article class="ink rounded-xl overflow-hidden flex sm:col-span-2">
@@ -389,7 +396,7 @@
     </section>
 
     <!-- ============ QUOTE WALL (cheat-sheet quotes) ============ -->
-    <section class="mt-12" aria-labelledby="textbook-title">
+    <section id="sec-quotes" class="mt-12 scroll-mt-6" aria-labelledby="textbook-title">
       <div class="bg-pop-pink dots ink rounded-2xl px-5 py-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
         <h2 id="textbook-title" class="font-pow text-3xl sm:text-4xl tracking-wide text-ink drop-shadow-[2px_2px_0_#fffdf6]">MORE SLAVIN, IN MY OWN WORDS</h2>
         <span class="caption text-ink rounded px-2.5 py-1 text-xs font-bold">TAP A CARD TO FLIP</span>
@@ -484,22 +491,20 @@
         </div>
       </div>
 
-      <!-- Interactive: reinforcement quiz -->
+      <!-- Interactive: multi-question quick check -->
       <div class="ink rounded-xl mt-8 p-5 sm:p-6 bg-white">
-        <h3 class="font-pow text-xl sm:text-2xl tracking-wide">Quick check: Chapter 4 in action</h3>
-        <p class="mt-2 font-bold text-ink/80" id="mot-quiz-prompt">Alex finally passes a test honestly. Slavin says behavior changes by its immediate consequences. What do I reinforce?</p>
-        <div class="mt-4 grid gap-3" role="group" aria-labelledby="mot-quiz-prompt">
-          <button type="button" class="mot-btn text-left ink-tight rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 font-bold" data-correct="false" data-msg="Candy is an extrinsic reinforcer bolted onto the outside. It can work, but it makes the treat the goal instead of the coding (Slavin, 2024, Ch. 4).">Give Alex candy for passing</button>
-          <button type="button" class="mot-btn text-left ink-tight rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 font-bold" data-correct="true" data-msg="Yes. Having Alex explain the fix makes the reward the understanding itself. That is an intrinsic reinforcer, the reward inherent in the behavior (Slavin, 2024, Ch. 4).">Have Alex explain how they solved it and name the skill they used</button>
-          <button type="button" class="mot-btn text-left ink-tight rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 font-bold" data-correct="false" data-msg="Saying 'finally' is an unpleasant consequence right after a success. Slavin warns that weakens the behavior you actually want to see more of (Ch. 4).">Point out that it took way too long</button>
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <h3 class="font-pow text-xl sm:text-2xl tracking-wide">Quick check: Slavin in action</h3>
+          <span id="quiz-score" class="font-pow text-sm tracking-wide bg-ink text-pop-yellow rounded-lg px-3 py-1" aria-live="polite">Score: 0 / 4</span>
         </div>
-        <p id="mot-quiz-feedback" role="status" aria-live="polite" class="mt-4 hidden rounded-xl px-4 py-3 font-bold text-sm leading-relaxed"></p>
+        <p class="mt-1 font-bold text-ink/70 text-sm">Four calls from real moments with Alex. Pick the move that matches the chapter.</p>
+        <div id="quiz-root" class="mt-5 space-y-6"></div>
       </div>
     </section>
   </main>
 
   <!-- ============ BACK MATTER: APA VAULT ============ -->
-  <footer class="bg-ink text-paper border-t-4 border-ink">
+  <footer id="sec-refs" class="bg-ink text-paper border-t-4 border-ink scroll-mt-6">
     <div class="max-w-6xl mx-auto px-3 sm:px-5">
       <button id="vault-toggle" type="button" aria-expanded="false" aria-controls="vault-panel"
         class="w-full flex items-center justify-between gap-3 py-4 text-left">
@@ -517,17 +522,81 @@
     </div>
   </footer>
 
-  <!-- ============ HONOR CODE STAMP ============ -->
-  <section class="bg-paper border-t-4 border-ink" aria-labelledby="honor-title">
-    <div class="max-w-6xl mx-auto px-3 sm:px-5 py-8">
-      <div class="stamp bg-pop-red text-paper rounded-2xl p-5 sm:p-7 -rotate-1">
-        <h2 id="honor-title" class="font-pow text-2xl sm:text-3xl tracking-wide">Honor Code Stamp</h2>
-        <label for="attestation" class="sr-only">Honor attestation (read only)</label>
-        <textarea id="attestation" readonly rows="3" aria-readonly="true"
-          class="mt-3 w-full resize-none rounded-xl bg-paper text-ink border-3 border-ink p-4 font-bold leading-relaxed focus:outline-none" style="border-width:3px">I attest that I did not use AI to create this project in its entirety. If I did use AI as a reference, I documented it as an APA resource.</textarea>
+  <!-- ============ RUBRIC CHECKLIST ============ -->
+  <section class="bg-paper border-t-4 border-ink" aria-labelledby="checklist-title">
+    <div class="max-w-6xl mx-auto px-3 sm:px-5 py-10">
+      <div class="bg-pop-green dots ink rounded-2xl px-5 py-4 mb-5 flex items-center justify-between gap-3 flex-wrap">
+        <h2 id="checklist-title" class="font-pow text-3xl sm:text-4xl tracking-wide text-ink drop-shadow-[2px_2px_0_#fffdf6]">DID I HIT EVERYTHING?</h2>
+        <span class="caption text-ink rounded px-2.5 py-1 text-xs font-bold">TAP AN ITEM TO JUMP TO IT</span>
       </div>
+      <p class="caption rounded-xl px-4 py-3 font-bold text-ink text-sm sm:text-base mb-6">
+        Every rubric requirement, checked off. Press any box to scroll to exactly where I did it on this page.
+      </p>
+
+      <ul class="grid sm:grid-cols-2 gap-4" role="list">
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="sec-handbook">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">Clear explanation of 4+ concepts</span>
+              <span class="text-sm text-ink/75 font-bold">Field Handbook: 8 theories defined (Bandura, Sweller, Vygotsky, Skinner, Deci &amp; Ryan, and more)</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="profile-tabs">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">Application to a real educational setting</span>
+              <span class="text-sm text-ink/75 font-bold">8 decision moments from my CS-lab tutoring placement with Alex</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="profile-tabs">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">8+ interactive / engaging elements</span>
+              <span class="text-sm text-ink/75 font-bold">Branching scenarios, live confidence meter, flip cards, quiz, searchable glossary</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="sec-fieldnotes">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">3+ references to my SL placement</span>
+              <span class="text-sm text-ink/75 font-bold">"From My Real Shifts": 7 field notes from my actual sessions</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="sec-quotes">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">References to the course text (Slavin)</span>
+              <span class="text-sm text-ink/75 font-bold">Direct Slavin quotes in every moment, plus the "More Slavin" quote wall</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="check-item w-full text-left ink rounded-xl bg-white hover:bg-pop-yellow/30 transition p-4 flex gap-4 items-start" data-target="sec-refs">
+            <span class="check-box shrink-0 w-9 h-9 grid place-items-center rounded-lg bg-pop-green text-ink font-pow text-xl border-3 border-ink" style="border-width:3px" aria-hidden="true">&check;</span>
+            <span>
+              <span class="font-pow text-lg tracking-wide block leading-tight">Textbook + 5 scholarly sources, APA 7</span>
+              <span class="text-sm text-ink/75 font-bold">Back Matter: Slavin plus 11 sources with accurate APA citations and DOIs</span>
+              <span class="text-xs font-pow tracking-wide text-pop-blue mt-1 inline-block">jump to it &rarr;</span>
+            </span>
+          </button>
+        </li>
+      </ul>
     </div>
-  </footer>
+  </section>
 
   <script>
   "use strict";
@@ -1001,16 +1070,86 @@
       });
     });
 
-    /* =========================== MOTIVATION QUIZ =========================== */
+    /* =========================== QUICK CHECK (multi-question) =========================== */
     (function () {
-      const fb = document.getElementById('mot-quiz-feedback');
-      document.querySelectorAll('.mot-btn').forEach((btn) => {
+      const QUIZ = [
+        {
+          tag: 'CH. 4 · REINFORCEMENT',
+          q: "Alex finally passes a test honestly. Slavin says behavior changes by its immediate consequences. What do I reinforce?",
+          options: [
+            { t: "Give Alex candy for passing", ok: false, m: "Candy is an extrinsic reinforcer bolted on from outside. It can work, but it makes the treat the goal instead of the coding (Slavin, 2024, Ch. 4)." },
+            { t: "Have Alex explain how they solved it and name the skill used", ok: true, m: "Yes. Explaining the fix makes the reward the understanding itself, an intrinsic reinforcer inherent in the behavior (Slavin, 2024, Ch. 4)." },
+            { t: "Point out that it took way too long", ok: false, m: "An unpleasant consequence right after a success weakens the behavior you actually want to see more of (Slavin, 2024, Ch. 4)." },
+          ],
+        },
+        {
+          tag: 'CH. 7 · LEARNING PROBES',
+          q: "I just explained how a loop counts. Alex nods and says 'I get it.' How do I actually check?",
+          options: [
+            { t: "Take the nod at face value and move on", ok: false, m: "A nod is politeness, not understanding. Slavin says to conduct learning probes instead of trusting it (2024, Ch. 7)." },
+            { t: "Ask Alex to predict what the loop prints before we run it", ok: true, m: "Exactly. A quick prediction is a learning probe. It shows me what Alex really knows before we move on (Slavin, 2024, Ch. 7)." },
+            { t: "Re-explain the whole thing one more time to be safe", ok: false, m: "That repeats what Alex already knows and skips the gap. A probe tells me what to reteach (Slavin, 2024, Ch. 7)." },
+          ],
+        },
+        {
+          tag: 'CH. 3 · BELONGING',
+          q: "Week 2. Alex says, 'Everyone already knows this, I'm just behind.' First move?",
+          options: [
+            { t: "Tell Alex to stop comparing and just focus", ok: false, m: "Dismissing the feeling does not remove it. Slavin ties academic confidence to belonging and the industry-versus-inferiority stage (2024, Ch. 3)." },
+            { t: "List everything Alex still has to learn", ok: false, m: "That confirms the fear and makes the mountain bigger. Belonging has to come first (Slavin, 2024, Ch. 3)." },
+            { t: "Name one real thing Alex already did right", ok: true, m: "Yes. A genuine win builds belonging, which Slavin says is central to how a student sees school (2024, Ch. 3)." },
+          ],
+        },
+        {
+          tag: 'CH. 6 · DIVERSE LEARNERS',
+          q: "A worked example uses baseball slang Alex does not know. Alex gets the loop but is stuck on the wrapper. What do I change?",
+          options: [
+            { t: "Tell Alex the example is standard and push through", ok: false, m: "That treats one cultural background as the default. Slavin says culture profoundly affects learning (2024, Ch. 6)." },
+            { t: "Swap in an example from something Alex knows well", ok: true, m: "Right. Same concept, familiar context. Meeting Alex's background is exactly Slavin's point (2024, Ch. 6)." },
+            { t: "Over-explain every word in the baseball example", ok: false, m: "Kind, but it burns the session on trivia. The fix is changing the example, not narrating it (Slavin, 2024, Ch. 6)." },
+          ],
+        },
+      ];
+
+      const root = document.getElementById('quiz-root');
+      const scoreEl = document.getElementById('quiz-score');
+      const answered = new Array(QUIZ.length).fill(false);
+      let score = 0;
+
+      QUIZ.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'ink-tight rounded-xl p-4 bg-paper/40';
+        const promptId = 'quiz-q-' + qi;
+        let opts = '';
+        item.options.forEach((o, oi) => {
+          opts += '<button type="button" class="quiz-opt text-left ink-tight rounded-xl bg-white hover:bg-pop-yellow/30 transition p-3 font-bold" ' +
+            'data-q="' + qi + '" data-ok="' + o.ok + '" data-msg="' + o.m.replace(/"/g, '&quot;') + '">' + o.t + '</button>';
+        });
+        card.innerHTML =
+          '<p class="font-pow text-xs tracking-widest text-pop-pink">' + item.tag + '</p>' +
+          '<p class="mt-1 font-bold text-ink" id="' + promptId + '">' + (qi + 1) + '. ' + item.q + '</p>' +
+          '<div class="mt-3 grid gap-2.5" role="group" aria-labelledby="' + promptId + '">' + opts + '</div>' +
+          '<p class="quiz-fb mt-3 hidden rounded-xl px-4 py-3 font-bold text-sm leading-relaxed" role="status" aria-live="polite"></p>';
+        root.appendChild(card);
+      });
+
+      root.querySelectorAll('.quiz-opt').forEach((btn) => {
         btn.addEventListener('click', () => {
-          const ok = btn.dataset.correct === 'true';
-          document.querySelectorAll('.mot-btn').forEach((b) => {
+          const qi = Number(btn.dataset.q);
+          const ok = btn.dataset.ok === 'true';
+          const card = btn.closest('div').parentElement;
+          const group = btn.parentElement;
+          const fb = card.querySelector('.quiz-fb');
+
+          group.querySelectorAll('.quiz-opt').forEach((b) => {
             b.classList.remove('ring-4', 'ring-green-400', 'ring-red-400', 'bg-pop-green/20', 'bg-pop-red/20');
           });
           btn.classList.add('ring-4', ok ? 'ring-green-400' : 'ring-red-400', ok ? 'bg-pop-green/20' : 'bg-pop-red/20');
+
+          if (ok && !answered[qi]) { answered[qi] = true; score++; }
+          else if (!ok && answered[qi]) { answered[qi] = false; score--; }
+          scoreEl.textContent = 'Score: ' + score + ' / ' + QUIZ.length;
+
           fb.textContent = btn.dataset.msg;
           fb.classList.remove('hidden', 'bg-green-100', 'text-green-900', 'bg-red-100', 'text-red-900');
           fb.classList.add(ok ? 'bg-green-100' : 'bg-red-100', ok ? 'text-green-900' : 'text-red-900');
@@ -1018,10 +1157,41 @@
       });
     })();
 
+    /* =========================== RUBRIC CHECKLIST (jump-to) =========================== */
+    (function () {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.querySelectorAll('.check-item').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = document.getElementById(btn.dataset.target);
+          if (!target) return;
+          if (btn.dataset.target === 'sec-refs') {
+            const panel = document.getElementById('vault-panel');
+            const toggle = document.getElementById('vault-toggle');
+            if (panel && !panel.classList.contains('open')) toggle.click();
+          }
+          target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+          target.classList.remove('flash-target');
+          void target.offsetWidth;
+          target.classList.add('flash-target');
+          setTimeout(() => target.classList.remove('flash-target'), 2000);
+        });
+      });
+    })();
+
     /* =========================== BACK MATTER (APA vault) =========================== */
     (function () {
-      document.getElementById('vault-list').innerHTML = APA_REFS.map((r) =>
-        '<li class="bg-paper/10 border-2 border-paper/30 rounded-lg p-3 leading-relaxed pl-7 -indent-4">' + r + '</li>').join('');
+      document.getElementById('vault-list').innerHTML = APA_REFS.map((r) => {
+        const urlMatch = r.match(/https?:\/\/[^\s<]+/);
+        const plain = r.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+        const href = urlMatch ? urlMatch[0] : 'https://scholar.google.com/scholar?q=' + encodeURIComponent(plain);
+        const body = urlMatch
+          ? r.replace(/(https?:\/\/[^\s<]+)/g, '<span class="text-pop-yellow break-all">$1</span>')
+          : r;
+        return '<li class="bg-paper/10 border-2 border-paper/30 rounded-lg p-0 leading-relaxed">' +
+          '<a href="' + href + '" target="_blank" rel="noopener noreferrer" ' +
+          'class="block p-3 pl-7 -indent-4 text-paper hover:bg-paper/15 hover:text-pop-yellow underline-offset-2 hover:underline rounded-lg transition">' +
+          body + '</a></li>';
+      }).join('');
       const toggle = document.getElementById('vault-toggle'), panel = document.getElementById('vault-panel'), chev = document.getElementById('vault-chevron');
       toggle.addEventListener('click', () => {
         const open = panel.classList.toggle('open');
